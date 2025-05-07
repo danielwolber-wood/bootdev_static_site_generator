@@ -159,5 +159,11 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
         all_nodes.extend(split_node_regex(old_node, split_type=TextType.LINK))
     return all_nodes
 
-def text_to_textnodes(test:str) -> list[TextNode]:
-    pass
+def text_to_textnodes(text:str) -> list[TextNode]:
+    nodes = [TextNode(text_type=TextType.TEXT, text=text)]
+    nodes = split_nodes_delimiter(old_nodes=nodes, delimiter="`", text_type=TextType.CODE)
+    nodes = split_nodes_delimiter(old_nodes=nodes, delimiter="**", text_type=TextType.BOLD)
+    nodes = split_nodes_delimiter(old_nodes=nodes, delimiter="_", text_type=TextType.ITALIC)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes

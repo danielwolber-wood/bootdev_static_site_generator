@@ -2,7 +2,6 @@ import unittest
 from src.textnode import TextNode, TextType
 
 class TestTextNode(unittest.TestCase):
-
     def test_equal_nodes(self):
         node1 = TextNode("Sample", TextType.TEXT)
         node2 = TextNode("Sample", TextType.TEXT)

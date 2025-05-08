@@ -60,10 +60,10 @@ def extract_markdown_images(text:str) -> list[tuple[str, str]]:
     matches = re.finditer(pattern, text)
 
     for m in matches:
-        #print(f'match is {m.group(0)}')  # full match
-        #print(f'start, end: {m.start()}, {m.end()}')
-        #print(f'alt text is: {m.group(1)}')
-        #print(f'URL is: {m.group(2)}')
+        ##print(f'match is {m.group(0)}')  # full match
+        ##print(f'start, end: {m.start()}, {m.end()}')
+        ##print(f'alt text is: {m.group(1)}')
+        ##print(f'URL is: {m.group(2)}')
         return_list.append((m.group(1), m.group(2)))
 
     return return_list
@@ -78,10 +78,10 @@ def split_node_image(old_node:TextNode) -> list[TextNode]:
     if not matches:
         return [old_node]
     for m in matches:
-        #print(f'match is {m.group(0)}')  # full match
-        #print(f'start, end: {m.start()}, {m.end()}')
-        #print(f'alt text is: {m.group(1)}')
-        #print(f'URL is: {m.group(2)}')
+        ##print(f'match is {m.group(0)}')  # full match
+        ##print(f'start, end: {m.start()}, {m.end()}')
+        ##print(f'alt text is: {m.group(1)}')
+        ##print(f'URL is: {m.group(2)}')
         prior_nonmatching_text = text[previous_end:m.start()]
         prior_node = TextNode(text=prior_nonmatching_text, text_type=old_node.text_type, url=None)
         image_node = TextNode(text=m.group(1), url=m.group(2), text_type=TextType.IMAGE)
@@ -109,10 +109,10 @@ def split_node_regex(old_node:TextNode, split_type:TextType) -> list[TextNode]:
     if not matches:
         return [old_node]
     for m in matches:
-        ##print(f'match is {m.group(0)}')  # full match
-        ##print(f'start, end: {m.start()}, {m.end()}')
-        ##print(f'alt text is: {m.group(1)}')
-        ##print(f'URL is: {m.group(2)}')
+        ###print(f'match is {m.group(0)}')  # full match
+        ###print(f'start, end: {m.start()}, {m.end()}')
+        ###print(f'alt text is: {m.group(1)}')
+        ###print(f'URL is: {m.group(2)}')
         prior_nonmatching_text = text[previous_end:m.start()]
         prior_node = TextNode(text=prior_nonmatching_text, text_type=old_node.text_type, url=None)
         image_node = TextNode(text=m.group(1), url=m.group(2), text_type=split_type)
@@ -287,9 +287,9 @@ def markdown_to_html_node(s:str) -> ParentNode:
     blocks  = markdown_to_blocks(s)
     for block in blocks:
         block_type = block_to_blocktype(block)
-        print("\n")
-        print(f"block is {block}")
-        print(f"block_type is {block_type}")
+        #print("\n")
+        #print(f"block is {block}")
+        #print(f"block_type is {block_type}")
         match block_type:
             case BlockType.PARAGRAPH:
                 new_node = block_to_paragraph_node(block)
@@ -308,3 +308,14 @@ def markdown_to_html_node(s:str) -> ParentNode:
         parent.children.append(new_node)
 
     return parent
+
+def extract_title(markdown:str) -> str:
+    lines = markdown.split("\n")
+    for line in lines:
+        if line[:2] == "# ":
+            #print("match found")
+            match = line[2:].strip()
+            #print(f"match is {match}")
+            return match
+
+    raise ValueError

@@ -1,6 +1,6 @@
 import unittest
 
-from src.utils import split_nodes_delimiter, extract_markdown_images, text_node_to_html_node, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, BlockType, block_to_blocktype, markdown_to_html_node
+from src.utils import split_nodes_delimiter, extract_markdown_images, text_node_to_html_node, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, BlockType, block_to_blocktype, markdown_to_html_node, extract_title
 from src.textnode import TextNode, TextType
 
 
@@ -621,6 +621,37 @@ that preserves **formatting**
             html,
             answer
         )
+
+
+class TestExtractTitleFromMarkdown(unittest.TestCase):
+    def test_extract_title_basic(self):
+        print("\n\ntest_extract_title_basic\n\n")
+        md = "# Hello World"
+        title = extract_title(md)
+        self.assertEqual(title, "Hello World")
+
+    def test_extract_title_with_whitespace(self):
+        print("\n\ntest_extract_title_with_whitespace\n\n")
+        md = "#    Title with extra spaces    "
+        title = extract_title(md)
+        self.assertEqual(title, "Title with extra spaces")
+
+    def test_extract_title_multiline(self):
+        print("\n\ntest_extract_title_multiline\n\n")
+        md = """
+Some text before
+# The Real Title
+Some text after
+    """
+        title = extract_title(md)
+        self.assertEqual(title, "The Real Title")
+
+    def test_extract_title_no_h1(self):
+        print("\n\ntest_extract_title_no_h1\n\n")
+        md = "## This is an h2, not an h1"
+        with self.assertRaises(Exception):
+            extract_title(md)
+
 if __name__ == "__main__":
     unittest.main()
 

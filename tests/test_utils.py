@@ -1,6 +1,6 @@
 import unittest
 
-from src.utils import split_nodes_delimiter, extract_markdown_images, text_node_to_html_node, split_nodes_image, split_nodes_link, text_to_textnodes
+from src.utils import split_nodes_delimiter, extract_markdown_images, text_node_to_html_node, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks
 from src.textnode import TextNode, TextType
 
 
@@ -420,6 +420,65 @@ class TestTextToTextNodes(unittest.TestCase):
         actual_nodes = text_to_textnodes(text)
         self.assertEqual(actual_nodes, expected_nodes)
         """
+
+class TestMarkdownToBlocks(unittest.TestCase):
+    def test_single_block(self):
+        md = "Just a single block"
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(blocks, ["Just a single block"])
+
+    def test_blocks_separated_by_blank_line(self):
+        md = "First block\n\nSecond block"
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(blocks, ["First block", "Second block"])
+
+    def test_trailing_and_leading_whitespace(self):
+        md = "\n\nBlock with whitespace\n\n\n"
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(blocks, ["Block with whitespace"])
+
+    def test_multiple_newlines_between_blocks(self):
+        md = "Block1\n\n\n\nBlock2"
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(blocks, ["Block1", "Block2"])
+
+    def test_example_from_assignment(self):
+        md = """
+# This is a heading
+
+This is a paragraph of text. It has some **bold** and _italic_ words inside of it.
+
+- This is the first list item in a list block
+- This is a list item
+- This is another list item"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "# This is a heading",
+                "This is a paragraph of text. It has some **bold** and _italic_ words inside of it.",
+                "- This is the first list item in a list block\n- This is a list item\n- This is another list item"
+            ])
+
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
 
 if __name__ == "__main__":
     unittest.main()

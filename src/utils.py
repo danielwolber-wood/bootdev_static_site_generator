@@ -167,3 +167,9 @@ def text_to_textnodes(text:str) -> list[TextNode]:
     nodes = split_nodes_image(nodes)
     nodes = split_nodes_link(nodes)
     return nodes
+
+def markdown_to_blocks(s:str) -> list[str]:
+    segments = s.split("\n\n")
+    segments = [s.strip() for s in segments]
+    segments = [s for s in segments if s != ""]
+    return segments

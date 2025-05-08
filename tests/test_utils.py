@@ -1,6 +1,6 @@
 import unittest
 
-from src.utils import split_nodes_delimiter, extract_markdown_images, text_node_to_html_node, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, BlockType, block_to_blocktype
+from src.utils import split_nodes_delimiter, extract_markdown_images, text_node_to_html_node, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, BlockType, block_to_blocktype, markdown_to_html_node
 from src.textnode import TextNode, TextType
 
 
@@ -537,7 +537,90 @@ class TestBlockToBlockType(unittest.TestCase):
         block = "This is a paragraph.\nWith multiple lines."
         self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
 
+class TestMarkdownToHTML(unittest.TestCase):
+    def test_paragraphs(self):
+        print("\n\ntest_paragraphs\n\n")
+        md = """
+This is **bolded** paragraph
+text in a p
+tag here
 
+This is another paragraph with _italic_ text and `code` here"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        answer = "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>"
+        print(f"html is \n{html}")
+        print(f"answer is \n{answer}")
+        self.assertEqual(
+            html,
+            answer
+        )
+
+    def test_codeblock(self):
+        print("\n\ntest codeblocks\n\n")
+        print("\n\n")
+        print("Test 2")
+        md = """
+        ```
+This is text that _should_ remain
+the **same** even with inline stuff
+```"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        answer="<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre></div>"
+        print(f"html is\n{html}")
+        print(f"answer is\n{answer}")
+        self.assertEqual(
+            html,
+            answer
+        )
+        print("\n")
+
+    def test_complex_lists(self):
+        print("\n\ntest complex lists\n\n")
+        md = """
+- Item with **bold**
+- Item with _italic_
+- Item with `code`
+
+1. Numbered with **bold**
+2. Numbered with _italic_
+3. Numbered with `code`
+    """
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        answer = "<div><ul><li>Item with <b>bold</b></li><li>Item with <i>italic</i></li><li>Item with <code>code</code></li></ul><ol><li>Numbered with <b>bold</b></li><li>Numbered with <i>italic</i></li><li>Numbered with <code>code</code></li></ol></div>"
+        print(f"html is \n{html}")
+        print(f"answer is \n{answer}")
+        self.assertEqual(
+            html,
+            answer
+        )
+
+    def test_mixed_blocks(self):
+        print("\n\ntest mixed blocks\n\n")
+        md = """
+# Heading with `code`
+
+> Quote with **bold** text
+> And a second line
+
+```
+Code block
+that preserves **formatting**
+```
+
+## Second heading
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        answer = "<div><h1>Heading with <code>code</code></h1><blockquote>Quote with <b>bold</b> text And a second line</blockquote><pre><code>Code block\nthat preserves **formatting**</code></pre><h2>Second heading</h2></div>"
+        print(f"html is \n{html}")
+        print(f"answer is \n{answer}")
+        self.assertEqual(
+            html,
+            answer
+        )
 if __name__ == "__main__":
     unittest.main()
 

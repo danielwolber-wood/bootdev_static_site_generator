@@ -2,7 +2,7 @@ import re
 
 from .blocktype import BlockType
 from .textnode import TextNode, TextType
-from .htmlnode import LeafNode, HTMLNode
+from .htmlnode import LeafNode, HTMLNode, ParentNode
 
 
 def text_node_to_html_node(node: TextNode) -> LeafNode:
@@ -174,7 +174,7 @@ def block_to_blocktype(s:str) -> BlockType:
     if len(quote_lines) == len(lines):
         return BlockType.QUOTE
 
-    unordered_list = [x for x in lines if x[:2] == "* "]
+    unordered_list = [x for x in lines if x[:2] == "* " or x[:2] == "+ " or x[:2] == "- "]
 
     if len(unordered_list) == len(lines):
         return BlockType.UNORDERED_LIST
@@ -198,3 +198,113 @@ def block_to_blocktype(s:str) -> BlockType:
 
     return BlockType.PARAGRAPH
 
+def text_to_children(s:str) -> list[LeafNode]:
+    textnodes = text_to_textnodes(s)
+    htmlnodes = list()
+    for textnode in textnodes:
+        htmlnode = text_node_to_html_node(textnode)
+        htmlnodes.append(htmlnode)
+    return htmlnodes
+
+
+def block_to_paragraph_node(block:str) -> ParentNode:
+    block = block.replace("\n", " ").strip() # only code block should retain newlines etc
+    children = text_to_children(block)
+    tag = "p"
+    return ParentNode(tag=tag, children=children)
+
+def block_to_heading_node(block:str) -> ParentNode:
+    level = 0
+    for char in block:
+        if char == '#':
+            level += 1
+        else:
+            break
+    content = block[level:].strip().replace("\n", " ")
+    tag = f"h{level}"
+    children = text_to_children(content)
+    return ParentNode(tag=tag, children=children)
+
+def block_to_code_node(block:str) -> ParentNode:
+    # should be a <code> block nested inside a <pre> block
+    lines = block.split("\n")
+    code_content = "\n".join(lines[1:-1]) #remove backticks
+    text_node = TextNode(code_content, TextType.TEXT)
+    code_node = text_node_to_html_node(text_node)
+    inner_node = ParentNode(tag="code", children=[code_node])
+    return ParentNode(tag="pre", children=[inner_node])
+
+def block_to_block_quote_node(block:str) -> ParentNode:
+    lines = block.split("\n")
+    cleaned_lines = list()
+    for line in lines:
+        #line = line.replace("> ", "")
+        if line.startswith("> "):
+            line = line[2:]
+        elif line.startswith(">"):
+            line = line[1:]
+        cleaned_lines.append(line)
+    quote_content = " ".join(cleaned_lines).strip()
+    children = text_to_children(quote_content)
+    tag = "blockquote"
+    return ParentNode(tag=tag, children=children)
+
+def block_to_unordered_list_node(block:str) -> ParentNode:
+    lines = block.split("\n")
+    line_nodes = list()
+    for line in lines:
+        if not line.strip():
+            continue
+        line = line[2:].strip() # remove leading "* ", "+ " and "- "
+        children = text_to_children(line)
+        line_node = ParentNode(tag="li", children=children)
+        line_nodes.append(line_node)
+
+    return ParentNode(tag="ul", children=line_nodes)
+
+def block_to_ordered_list_node(block:str) -> ParentNode:
+    lines = block.split("\n")
+    line_nodes = list()
+    for line in lines:
+        if not line.strip():
+            continue
+        # remove leading digit, dot, and space
+        pieces = line.split(".")
+        rejoined = ".".join(pieces[1:]).strip()
+        children = text_to_children(rejoined)
+        line_node = ParentNode(tag="li", children=children)
+        line_nodes.append(line_node)
+
+    return ParentNode(tag="ol", children=line_nodes)
+
+def markdown_to_html_node(s:str) -> ParentNode:
+
+    parent = ParentNode("div", children=list(),props=list())
+
+    if s == "":
+        return parent
+
+    blocks  = markdown_to_blocks(s)
+    for block in blocks:
+        block_type = block_to_blocktype(block)
+        print("\n")
+        print(f"block is {block}")
+        print(f"block_type is {block_type}")
+        match block_type:
+            case BlockType.PARAGRAPH:
+                new_node = block_to_paragraph_node(block)
+            case BlockType.HEADING:
+                new_node = block_to_heading_node(block)
+            case BlockType.CODE:
+                new_node = block_to_code_node(block)
+            case BlockType.ORDERED_LIST:
+                new_node = block_to_ordered_list_node(block)
+            case BlockType.UNORDERED_LIST:
+                new_node = block_to_unordered_list_node(block)
+            case BlockType.QUOTE:
+                new_node = block_to_block_quote_node(block)
+            case _:
+                raise ValueError
+        parent.children.append(new_node)
+
+    return parent

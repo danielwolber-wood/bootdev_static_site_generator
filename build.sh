@@ -1,0 +1,1 @@
+python3 src/main.py --basepath github.com/danielwolber-wood/bootdev_static_site_generator

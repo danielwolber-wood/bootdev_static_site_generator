@@ -321,7 +321,7 @@ def extract_title(markdown:str) -> str:
 
     raise ValueError
 
-def generate_page(from_path: pathlib.Path, template_path: pathlib.Path, dest_path:pathlib.Path) -> None:
+def generate_page(from_path: pathlib.Path, template_path: pathlib.Path, dest_path:pathlib.Path, basepath: str) -> None:
     print(f"generating page {str(from_path)} to {str(dest_path)} using {str(template_path)}")
 
     with open(from_path) as f:
@@ -339,7 +339,7 @@ def generate_page(from_path: pathlib.Path, template_path: pathlib.Path, dest_pat
     title = extract_title(markdown_content)
     print(f"title is {title}")
 
-    final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html)
+    final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html).replace('href="/', f'href="{basepath}/').replace('src="/', f'src="{basepath}/')
 
     # ensure that destination directory exists
     print(f'parent is {dest_path.parent}')

@@ -4,12 +4,6 @@ This is a Markdown to HTML static site generator written in Python as part of th
 
 An example website generated using this program is available at https://danielwolber-wood.github.io/bootdev_static_site_generator
 
-## Program Architecture
-
-![Program Architecture.png](Program%20Architecture.png)
-
-![Program Processing.png](Program%20Processing.png)
-
 ## Installation
 
 1. **Prerequisites**
@@ -58,3 +52,8 @@ An example website generated using this program is available at https://danielwo
    - `--destination`: Output directory for generated HTML (default: ./docs)
    - `--template`: Path to HTML template file (default: ./template.html)
    - `--basepath`: Base path for the site (default: /)
+ 
+## How it Works
+
+![Program Processing.png](Program%20Processing.png)
+

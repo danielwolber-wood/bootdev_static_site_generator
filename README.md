@@ -1,4 +1,4 @@
-# bootdev_static_site_generator
+# Portfolio Static Site Generator
 
 This is a Markdown to HTML static site generator written in Python as part of the Backend Developer course on [boot.dev](https://boot.dev). 
 

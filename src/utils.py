@@ -335,7 +335,8 @@ def generate_page(from_path: pathlib.Path, template_path: pathlib.Path, dest_pat
     print(html)
     print("-----")
 
-    title = "<h1>" + extract_title(markdown_content) + "</h1>"
+    #title = "<h1>" + extract_title(markdown_content) + "</h1>"
+    title = extract_title(markdown_content)
     print(f"title is {title}")
 
     final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html)

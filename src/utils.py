@@ -2,6 +2,8 @@ from itertools import zip_longest
 import re
 
 from dataclasses import dataclass
+
+from .blocktype import BlockType
 from .textnode import TextNode, TextType
 from .htmlnode import LeafNode
 
@@ -173,3 +175,44 @@ def markdown_to_blocks(s:str) -> list[str]:
     segments = [s.strip() for s in segments]
     segments = [s for s in segments if s != ""]
     return segments
+
+def block_to_blocktype(s:str) -> BlockType:
+    """Identifies a block of markdown text as a paragraph, heading, code block, block quote, ordered list, or unordered list"""
+    if s == "":
+        return BlockType.PARAGRAPH
+
+    if s[:3] == '```' and s[-3:] == "```":
+        return BlockType.CODE
+
+    lines = s.split("\n")
+    quote_lines = [x for x in lines if x[0] == ">"]
+
+    if len(quote_lines) == len(lines):
+        return BlockType.QUOTE
+
+    unordered_list = [x for x in lines if x[:2] == "* "]
+
+    if len(unordered_list) == len(lines):
+        return BlockType.UNORDERED_LIST
+
+    heading_regex = r"^#{1,6} \w+"
+    heading_match = re.match(pattern=heading_regex, string=lines[0])
+    if heading_match:
+        return BlockType.HEADING
+
+    for index, item in enumerate(lines):
+        ordered_list_start = f"{index+1}. "
+        item_start = item[:len(ordered_list_start)]
+        if item_start == ordered_list_start:
+            continue
+        else:
+            break
+    else:
+        return BlockType.ORDERED_LIST
+
+
+
+    return BlockType.PARAGRAPH
+
+
+

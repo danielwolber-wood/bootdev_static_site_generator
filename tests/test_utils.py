@@ -1,6 +1,6 @@
 import unittest
 
-from src.utils import split_nodes_delimiter, extract_markdown_images, text_node_to_html_node, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks
+from src.utils import split_nodes_delimiter, extract_markdown_images, text_node_to_html_node, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, BlockType, block_to_blocktype
 from src.textnode import TextNode, TextType
 
 
@@ -479,6 +479,60 @@ This is the same paragraph on a new line
                 "- This is a list\n- with items",
             ],
         )
+
+class TestBlockToBlockType(unittest.TestCase):
+    def test_code_block(self):
+        block = "```\nprint('Hello, world!')\n```"
+        self.assertEqual(block_to_blocktype(block), BlockType.CODE)
+
+    def test_block_quote(self):
+        block = "> This is a quote\n> With multiple lines"
+        self.assertEqual(block_to_blocktype(block), BlockType.QUOTE)
+
+    def test_unordered_list(self):
+        block = "* Item 1\n* Item 2\n* Item 3"
+        self.assertEqual(block_to_blocktype(block), BlockType.UNORDERED_LIST)
+
+    def test_ordered_list(self):
+        block = "1. First item\n2. Second item\n3. Third item"
+        self.assertEqual(block_to_blocktype(block), BlockType.ORDERED_LIST)
+
+    def test_heading_level_1(self):
+        block = "# Heading 1"
+        self.assertEqual(block_to_blocktype(block), BlockType.HEADING)
+
+    def test_heading_level_3(self):
+        block = "### Heading 3"
+        self.assertEqual(block_to_blocktype(block), BlockType.HEADING)
+
+    def test_heading_invalid_spacing(self):
+        block = "##Heading without space"
+        self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
+
+    def test_mixed_quote_and_text(self):
+        block = "> Quote\nNot a quote"
+        self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
+
+    def test_mixed_unordered_list_and_text(self):
+        block = "* Item 1\nAnother line"
+        self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
+
+    def test_mixed_ordered_list_and_text(self):
+        block = "0. Item 1\nSomething else"
+        self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
+
+    def test_empty_block(self):
+        block = ""
+        self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
+
+    def test_single_line_paragraph(self):
+        block = "This is a paragraph."
+        self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
+
+    def test_multiline_paragraph(self):
+        block = "This is a paragraph.\nWith multiple lines."
+        self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
+
 
 if __name__ == "__main__":
     unittest.main()

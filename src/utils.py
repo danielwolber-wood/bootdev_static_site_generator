@@ -1,11 +1,9 @@
-from itertools import zip_longest
 import re
-
-from dataclasses import dataclass
 
 from .blocktype import BlockType
 from .textnode import TextNode, TextType
-from .htmlnode import LeafNode
+from .htmlnode import LeafNode, HTMLNode
+
 
 def text_node_to_html_node(node: TextNode) -> LeafNode:
     match node.text_type:
@@ -51,20 +49,6 @@ def split_nodes_delimiter(old_nodes:list[TextNode], delimiter:str, text_type:Tex
             new_nodes = new_nodes[:-1]
         all_new_nodes.extend(new_nodes)
     return all_new_nodes
-
-@dataclass
-class RegexMatch:
-    start: int
-    end: int
-    url: str
-    alt_text: str
-    text_type:TextType
-
-@dataclass
-class NonMatch:
-    start: int
-    end: int
-    text_type: TextType
 
 def extract_markdown_images(text:str) -> list[tuple[str, str]]:
     """Finds and extract all markdown images and alt text using regex
@@ -213,6 +197,4 @@ def block_to_blocktype(s:str) -> BlockType:
 
 
     return BlockType.PARAGRAPH
-
-
 

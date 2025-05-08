@@ -485,6 +485,10 @@ class TestBlockToBlockType(unittest.TestCase):
         block = "```\nprint('Hello, world!')\n```"
         self.assertEqual(block_to_blocktype(block), BlockType.CODE)
 
+    def test_code_block_mismatched(self):
+        block = "```\nprint('Hello, world!')\n``"
+        self.assertEqual(block_to_blocktype(block), BlockType.PARAGRAPH)
+
     def test_block_quote(self):
         block = "> This is a quote\n> With multiple lines"
         self.assertEqual(block_to_blocktype(block), BlockType.QUOTE)

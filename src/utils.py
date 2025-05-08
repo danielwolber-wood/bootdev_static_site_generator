@@ -339,7 +339,7 @@ def generate_page(from_path: pathlib.Path, template_path: pathlib.Path, dest_pat
     title = extract_title(markdown_content)
     print(f"title is {title}")
 
-    final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html).replace('href="/', f'href="{basepath}/').replace('src="/', f'src="{basepath}/')
+    final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html).replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
 
     # ensure that destination directory exists
     print(f'parent is {dest_path.parent}')

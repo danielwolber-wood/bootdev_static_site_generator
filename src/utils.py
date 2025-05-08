@@ -1,8 +1,9 @@
 import re
+import pathlib
 
-from .blocktype import BlockType
-from .textnode import TextNode, TextType
-from .htmlnode import LeafNode, HTMLNode, ParentNode
+from blocktype import BlockType
+from textnode import TextNode, TextType
+from htmlnode import LeafNode, HTMLNode, ParentNode
 
 
 def text_node_to_html_node(node: TextNode) -> LeafNode:
@@ -319,3 +320,30 @@ def extract_title(markdown:str) -> str:
             return match
 
     raise ValueError
+
+def generate_page(from_path: pathlib.Path, template_path: pathlib.Path, dest_path:pathlib.Path) -> None:
+    print(f"generating page {str(from_path)} to {str(dest_path)} using {str(template_path)}")
+
+    with open(from_path) as f:
+        markdown_content = f.read()
+
+    with open(template_path) as f:
+        template_content = f.read()
+
+    html = markdown_to_html_node(markdown_content).to_html()
+    print("\nhtml is:")
+    print(html)
+    print("-----")
+
+    title = "<h1>" + extract_title(markdown_content) + "</h1>"
+    print(f"title is {title}")
+
+    final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html)
+
+    # ensure that destination directory exists
+    print(f'parent is {dest_path.parent}')
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+
+    with open(dest_path, "w") as f:
+        f.write(final_html)
